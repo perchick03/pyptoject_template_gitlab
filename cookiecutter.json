@@ -2,5 +2,6 @@
     "project_name": "",
     "full_name": "Peretz Levinov",
     "email": "perchick03@gmail.com",
-    "version": "0.1.0"
+    "version": "0.1.0",
+    "initialize_project": ["yes", "no"]
 }

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{{cookiecutter.project_name}}"
+authors = [{name = "{{ cookiecutter.full_name }}", email="{{ cookiecutter.email }}"}]
+readme = "README.md"
+license = { file="LICENSE" }
+dynamic = ["dependencies", "version"]
+
+requires-python = ">=3.7"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+version = {attr = "{{cookiecutter.project_name}}.__version__"}
+
+[project.scripts]
+{{cookiecutter.project_name}}_cli = '{{cookiecutter.project_name}}.cli:cli'

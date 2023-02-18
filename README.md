@@ -14,7 +14,7 @@ pip install -U cookiecutter
 
 Generate a Python package project:
 ```bash
-cookiecutter gh:perchick03/pln-proj-template-py
+cookiecutter gl:perchick03/pyproject_template
 ```
 
 # Features

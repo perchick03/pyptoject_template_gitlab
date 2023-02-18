@@ -17,6 +17,35 @@ Generate a Python package project:
 cookiecutter gl:perchick03/pyproject_template
 ```
 
+To push project to GitLab after generation:
+```bash
+# To gitlab.com with SSH
+git push --set-upstream git@gitlab.example.com:username/new-repo.git master
+
+# To gitlab.com with HTTP
+git push --set-upstream https://gitlab.example.com/username/new-repo.git master
+```
+for example, lets create dummy_project:
+```bash
+cookiecutter gl:perchick03/pyproject_template
+````
+```text
+project_name []: dummy_project
+full_name []: developer 
+email []: developer@example.com
+version []: 0.1.0
+Select initialize_project:
+1 - yes
+2 - no
+Choose from 1, 2 [1]: 1
+```
+cd to project and create new repo on gitlab
+```bash
+cd gitlab_template_testing
+git push --set-upstream git@gitlab.com:developer/dummy_project.git master
+```
+
+
 # Features
 
 

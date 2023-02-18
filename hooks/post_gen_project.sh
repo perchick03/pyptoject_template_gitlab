@@ -9,8 +9,7 @@ fi
 # Initialize git repository
 echo "Initializing git repository..."
 git init
-git add .
-git commit -m "Initial commit"
+
 
 if [[ "$VIRTUAL_ENV" == "" ]]; then
     # Create virtual environment
@@ -31,3 +30,12 @@ pip install -r requirements_dev.txt
 # Install pre-commit hooks in background
 pre-commit install
 pre-commit autoupdate
+
+echo "Running pre-commit hooks before initial commit..."
+# add all files to git index and run pre-commit fixers
+git add .
+pre-commit run --all-files || true
+
+# add files again to git index after pre-commit fixers
+git add .
+git commit -m "Initial commit"

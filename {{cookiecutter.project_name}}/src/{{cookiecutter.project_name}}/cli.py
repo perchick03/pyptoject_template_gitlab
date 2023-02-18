@@ -4,8 +4,9 @@ import click
 try:
     from {{cookiecutter.project_name}} import __version__
 except ModuleNotFoundError:
-    sys.error('ModuleNotFoundError: {{cookiecutter.project_name}} not found, make sure {{cookiecutter.project_name}} is install using pip install -e .')
+    print('ModuleNotFoundError: {{cookiecutter.project_name}} not found, make sure {{cookiecutter.project_name}} is install using pip install -e .', file=sys.stderr)
     exit(1)
+
 
 class CliCtx:
     def __init__(self):

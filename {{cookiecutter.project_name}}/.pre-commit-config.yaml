@@ -47,7 +47,7 @@ repos:
         hooks:
         - id: reorder-python-imports
           name: Reorder Python imports (src, tests)
-          files: "^(?!examples/)"
+          files: "^(?!docs/)"
           args: ["--application-directories", "src"]
 
     # mypy - lint-like type checking
@@ -78,6 +78,11 @@ repos:
       rev: v0.8.0.3
       hooks:
         - id: shellcheck
+
+    - repo: https://gitlab.com/orobardet/gitlab-ci-linter/
+      rev: v2.2.0
+      hooks:
+        - id: gitlab-ci-linter
 
       # github actions linter
 #    - repo: https://github.com/sirosen/check-jsonschema

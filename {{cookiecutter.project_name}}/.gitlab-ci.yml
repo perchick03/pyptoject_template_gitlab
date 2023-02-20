@@ -1,0 +1,56 @@
+image: python:3.8-alpine
+
+variables:
+  GIT_STRATEGY: clone
+
+  # CICD Docker image
+  CI_DEV_DOCKER_VERSION: "0.0.1"
+  CI_DEV_DOCKER_IMAGE: ${CI_REGISTRY_IMAGE}/${CI_PROJECT_NAME}_ci_image
+
+  # Change pip's cache directory to be inside the project directory since we can
+  # only cache local items.
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+  TWINE_PASSWORD: ${CI_JOB_TOKEN}
+  TWINE_USERNAME: gitlab-ci-token
+  TWINE_REPO_URL: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
+  # enable buildkit for better caching
+  DOCKER_BUILDKIT: 1
+  # for pipeline debug
+  CI_DEBUG_TRACE: "false"
+
+# https://pip.pypa.io/en/stable/reference/pip_install/#caching
+#
+# If you want to also cache the installed packages, you have to install
+# them in a virtualenv and cache it as well.
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+before_script:
+  - python -V               # Print out python version for debugging
+  - pip3 install virtualenv
+  - virtualenv venv
+  - source venv/bin/activate
+  - pip3 install -r requirements_dev.txt
+  - pip3 install -e .
+
+
+
+stages:
+  - build
+  - test
+  - deploy
+  - reports
+
+workflow:
+  rules:
+    # Disable double pipeline on MR. https://docs.gitlab.com/ee/ci/yaml/workflow.html#switch-between-branch-pipelines-and-merge-request-pipelines
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      # There is no need for MR pipeline currently (branch pipeline runs on MR as well and its the same pipeline currently)
+      when: never
+    - when: always
+
+include:
+  - local: "gitlab/gitlab-ci.build.yml"

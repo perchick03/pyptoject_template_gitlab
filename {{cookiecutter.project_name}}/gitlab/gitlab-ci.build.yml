@@ -1,0 +1,33 @@
+# Build python package
+build_package:
+  stage: build
+  rules:
+    # git push -o ci.variable="build_package=ON"
+    - if: $build_package=="ON"
+    - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    - when: on_success
+  script:
+    - python3 -m build --wheel --outdir dist
+    - check-wheel-contents dist/*.whl
+  artifacts:
+    paths:
+      - dist/*.whl
+    expire_in: 1 day
+
+
+# Publish python package to gitlab package registry
+# This job will run on a tag push of semantic version format (e.g., v1.2.3)
+publish_package:
+  stage: build
+  rules:
+    # git push -o ci.variable="publish_package=ON" -o ci.variable="build_package=ON"
+    - if: $publish_package=="ON" && $build_package=="ON"
+    - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    # git tag v1.2.3 && git push origin v1.2.3
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+  needs:
+    - build_package
+  script:
+    - twine upload --repository-url ${TWINE_REPO_URL} dist/*.whl --verbose

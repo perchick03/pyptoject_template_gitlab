@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=45", "wheel"]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -13,7 +13,11 @@ requires-python = ">=3.7"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
-version = {attr = "{{cookiecutter.project_name}}.__version__"}
+
+
+[tool.setuptools_scm]
+write_to = "src/{{ cookiecutter.project_name }}/_version.py"
+
 
 [project.scripts]
 {{cookiecutter.project_name}}_cli = '{{cookiecutter.project_name}}.cli:cli'

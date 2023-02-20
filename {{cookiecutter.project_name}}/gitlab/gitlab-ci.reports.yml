@@ -1,0 +1,146 @@
+# Combine all test reports to a single report
+# This job runs on every push or if job flag are set
+cov_reports:
+  stage: reports
+  tags:
+    - linux
+  rules:
+    # git push -o ci.variable="cov_reports=ON" -o ci.variable="unit_tests=ON"
+    - if: $cov_reports=="ON" && ($unit_tests=="ON" || $integration_tests=="ON" || $system_tests=="ON")
+    - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    - when: on_success
+  allow_failure: true
+  script:
+    # combine all cov reports
+    - unset COVERAGE_FILE
+    - coverage combine
+    - coverage report -m
+    - coverage html -d coverage_html
+  needs: ["unit_tests", "integration_tests", "system_tests"]
+  # Gitlab coverage banner
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    paths:
+      - coverage_html
+    # used by GitLab
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+
+# Static Analysis checks for code quality, vulnerability and security issues
+# This job runs on every push or if job flag are set
+static_analysis:
+  stage: reports
+  allow_failure: true
+  rules:
+    # git push -o ci.variable="static_analysis=ON"
+    - if: $static_analysis=="ON"
+    - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    - when: on_success
+  script:
+    # Pylint and Mypy checks
+    - pylint --rcfile=.pylintrc --output-format=parseable -j 4 src/* | tee pylint_report.txt || pylint-exit $?
+    - score=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' pylint_report.txt)
+    - echo "============================"
+    - echo "Pylint score was $score"
+    - echo "============================"
+    - mypy --ignore-missing-imports src | tee mypy_report.txt
+    - coverage report -m
+  artifacts:
+    expire_in: 60 minutes
+    when: always
+    paths:
+      - pylint_report.txt
+      - mypy_report.txt
+
+# Runs license checks on package
+# This job runs on every push or if job flag are set
+license_report:
+  stage: reports
+  allow_failure: true
+  rules:
+    # git push -o ci.variable="license_report=ON"
+    - if: $license_report=="ON"
+    - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    - when: on_success
+  script:
+    # TODO: probably I want to install new packages in a separate job and run license check on it. Its ok for now
+    - pip3 install pip-licenses
+    - pip-licenses -dsu -f csv --output-file license_report.csv
+    - pip-licenses -dsu
+  artifacts:
+    expire_in: 60 minutes
+    when: always
+    paths:
+      - license_report.csv
+
+# TODO: Enable this job
+package_info:
+    stage: reports
+    allow_failure: true
+    rules:
+      # git push -o ci.variable="package_info=ON"
+      - if: $package_info=="ON"
+      - if: $CUSTOM_PIPELINE=="ON"
+        when: never
+      - when: on_success
+    needs: ["build_package"]
+    script:
+      - echo "Show some package stats and diff from last tag"
+      - pip3 install wheel-inspect
+      - wheel2json $(ls ./*.whl | xargs -n1) | tee package_info.json
+    artifacts:
+      expire_in: 60 minutes
+      when: always
+      paths:
+        - package_info.json
+
+
+# This job gives some stats about the pipeline that just ran
+# TODO: moved to python gitlab API
+pipeline_stats_report:
+  stage: reports
+  allow_failure: true
+  # https://docs.gitlab.com/ee/api/pipelines.html#list-project-pipelines
+  script:
+    |
+    curl --header "JOB_TOKEN: $CI_JOB_TOKEN" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
+
+# Group all artifacts in a single place for easy download
+#artifacts_report:
+#  stage: reports
+#  allow_failure: true
+#  script:
+#    |
+#    echo "========================================================"
+#    echo "Artifacts available for download"
+#    echo "========================================================"
+#  artifacts:
+#    expire_in: 60 minutes
+#    when: always
+#    paths:
+#      - license_report.csv
+#      - pylint_report.txt
+#      - mypy_report.txt
+#      - coverage_html/
+#      - coverage.xml
+#      - gl-code-quality-report.json
+#  needs:
+#    - job: code_quality
+#      optional: true
+#    - job: license_report
+#      optional: true
+
+# TODO: enable this. Currently, it takes 5 min to run so it is disabled
+#include:
+#  - template: Code-Quality.gitlab-ci.yml
+#
+#code_quality:
+#  stage: reports
+#  artifacts:
+#    paths: [gl-code-quality-report.json]

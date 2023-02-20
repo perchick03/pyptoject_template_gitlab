@@ -1,0 +1,66 @@
+exclude: |
+  (?x)^(tests|docs)
+repos:
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v4.4.0
+      hooks:
+        # invalid files
+        - id: check-ast # Simply check whether the files parse as valid python.
+        - id: check-yaml #This hook checks yaml files for parseable syntax
+          args: [ '--unsafe' ] # check syntax instead of attempt to load because gitlab yaml are not portable
+        - id: check-json # This hook checks json files for parseable syntax
+        - id: check-toml # check toml files
+
+        # git checks
+        - id: check-added-large-files # Prevent giant files from being committed
+        - id: check-merge-conflict #Check for files that contain merge conflict strings
+        - id: detect-private-key
+
+        # Python Checks
+        - id: check-docstring-first # checks a common error of defining a docstring after code.
+        - id: requirements-txt-fixer #sorts entries in requirements.txt.
+
+        # General quality checks
+        - id: end-of-file-fixer # Ensures that a file is either empty, or ends with one newline
+        - id: trailing-whitespace # trims trailing whitespace
+        - id: pretty-format-json #sets a standard for formatting json files.
+        - id: mixed-line-ending # replaces or checks mixed line ending.
+
+
+    # pep-8 style https://ayush-raj-blogs.hashnode.dev/making-clean-pr-for-open-source-contributors-pep-8-style
+    - repo: https://github.com/myint/autoflake
+      rev: v2.0.1
+      hooks:
+        - id: autoflake
+          args:
+            - --in-place
+            - --remove-all-unused-imports
+            - --expand-star-imports
+            - --remove-duplicate-keys
+            - --remove-unused-variables
+
+
+    # Lines containing and after lines which contain a # noreorder comment will be ignored (import matplotlib  # noreorder)
+    # The style chosen by reorder-python-imports has a single aim: reduce merge conflicts.
+    -   repo: https://github.com/asottile/reorder_python_imports
+        rev: v3.9.0
+        hooks:
+        - id: reorder-python-imports
+          name: Reorder Python imports (src, tests)
+          files: "^(?!examples/)"
+          args: ["--application-directories", "src"]
+
+    # mypy - lint-like type checking
+    - repo: https://github.com/pre-commit/mirrors-mypy
+      rev: v1.0.1
+      hooks:
+        - id: mypy
+          additional_dependencies: [types-all]
+
+
+    # flake8 - linting
+    - repo: https://github.com/pycqa/flake8
+      rev: 6.0.0
+      hooks:
+        - id: flake8
+          args: [--max-line-length=180]

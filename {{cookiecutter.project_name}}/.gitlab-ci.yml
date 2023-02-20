@@ -28,7 +28,7 @@ cache:
     - .cache/pip
     - venv/
 
-before_script:
+.pre:
   - python -V               # Print out python version for debugging
   - pip3 install virtualenv
   - virtualenv venv
@@ -40,7 +40,7 @@ before_script:
 
 stages:
   - build
-  - test
+  - tests
   - deploy
   - reports
 
@@ -54,3 +54,4 @@ workflow:
 
 include:
   - local: "gitlab/gitlab-ci.build.yml"
+  - local: "gitlab/gitlab-ci.tests.yml"

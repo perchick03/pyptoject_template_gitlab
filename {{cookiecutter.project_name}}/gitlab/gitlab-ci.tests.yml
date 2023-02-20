@@ -1,0 +1,83 @@
+unit_tests:
+  stage: tests
+  tags:
+   - linux
+  rules:
+    # git push -o ci.variable="unit_tests=ON"
+    - if: $unit_tests=="ON"
+    - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    - when: on_success
+
+  script:
+    - pytest --collect-only -q tests/unit || exit 0
+    - export COVERAGE_FILE=.coverage.unit
+    - python3 -m pytest -svv --color=yes --junitxml=junit_unit_report.xml --cov-config=.coveragerc --cov-report term-missing --cov-report xml --cov=src tests/unit
+    - coverage xml --omit=tests
+  artifacts:
+    expire_in: 2 days
+    paths:
+      - .coverage.unit
+      - coverage.xml
+      - junit_unit_report.xml
+    reports:
+      junit: junit_unit_report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+integration_tests:
+  stage: tests
+  tags:
+   - linux
+  rules:
+    # git push -o ci.variable="integration_tests=ON"
+    - if: $integration_tests=="ON"
+    - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    - when: on_success
+  script:
+    - pytest --collect-only -q tests/integration || exit 0
+    - export COVERAGE_FILE=.coverage.integration
+    - python3 -m pytest -s --color=yes --junitxml=junit_integration_tests_report_linux.xml --cov-config=.coveragerc --cov-report term-missing --cov-report xml --cov-append --cov=src tests/integration
+    - coverage xml --omit=tests
+  artifacts:
+    expire_in: 2 days
+    paths:
+      - .coverage.integration
+      - coverage.xml
+      - junit_integration_tests_report_linux.xml
+    reports:
+      junit: junit_integration_tests_report_linux.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+
+system_tests:
+  stage: tests
+  tags:
+   - linux
+  rules:
+    # git push -o ci.variable="system_tests=ON"
+    - if: $integration_tests=="ON"
+    - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    - when: on_success
+  script:
+    - pytest --collect-only -q tests/system || exit 0
+    - export COVERAGE_FILE=.coverage.system
+    - python3 -m pytest -s --color=yes --junitxml=junit_system_tests_report_linux.xml --cov-config=.coveragerc --cov-report term-missing --cov-append --cov-report xml --cov=src tests/system
+    - coverage xml --omit=tests
+    - ls -la
+  artifacts:
+    expire_in: 2 days
+    paths:
+      - coverage.xml
+      - .coverage.system
+      - junit_system_tests_report_linux.xml
+    reports:
+      junit: junit_system_tests_report_linux.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml

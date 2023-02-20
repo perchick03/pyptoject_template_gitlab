@@ -30,13 +30,15 @@ cache:
 
 .pre:
   - python -V               # Print out python version for debugging
+  - pip3 install --upgrade pip
   - pip3 install virtualenv
   - virtualenv venv
   - source venv/bin/activate
   - pip3 install -r requirements_dev.txt
   - pip3 install -e .
 
-
+before_script:
+  - source venv/bin/activate
 
 stages:
   - build

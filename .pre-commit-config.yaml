@@ -1,5 +1,5 @@
 exclude: |
-    (?x)^(tests|{{cookiecutter.project_name}}/docs)
+    (?x)^(tests|{{cookiecutter.project_name}}/docs|{{cookiecutter.project_name}}/gitlab/gitlab-ci.deploy.yml)
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
       rev: v4.4.0

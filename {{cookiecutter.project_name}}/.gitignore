@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 .idea/
+
+# generated version file using setuptool_scm
+_version.py

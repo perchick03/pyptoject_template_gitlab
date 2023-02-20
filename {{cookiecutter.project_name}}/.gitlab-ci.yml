@@ -53,5 +53,6 @@ workflow:
     - when: always
 
 include:
+  - local: "gitlab/gitlab-ci.build_ci_image.yml"
   - local: "gitlab/gitlab-ci.build.yml"
   - local: "gitlab/gitlab-ci.tests.yml"

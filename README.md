@@ -6,6 +6,21 @@ It is based on best practices I use in most of my projects.
 
 I based on [cookiecutter](https://github.com/cookiecutter/cookiecutter) tool to create this template.
 
+# Features 
+* filesystem src layout
+* versioning with setuptools_scm
+* git pre-commit hooks 
+* gitlab-ci pipeline setup
+* tests 
+  * unit, integration and system split
+  * using pytest
+* basic cli with click
+* project post-gen initialization - will initialize git and setup pre-commit hooks
+* code quality tools such as pylint, mypy, flake8 
+* tox setup
+* documentation with sphinx
+  
+
 # Quick Start
 Install the latest Cookiecutter if you haven't installed it yet:
 ```bash
@@ -17,7 +32,9 @@ Generate a Python package project:
 cookiecutter gl:perchick03/pyproject_template
 ```
 
-To push project to GitLab after generation:
+
+
+# GitLab project setup
 ```bash
 # To gitlab.com with SSH
 git push --set-upstream git@gitlab.example.com:username/new-repo.git master
@@ -64,12 +81,7 @@ git push --set-upstream git@gitlab.com:developer/dummy_project.git master
 
 ## Tools
 ### pre-commit
-installation
-```bash
-pip install pre-commit
-# setup pre-commit hooks
-pre-commit install
-```
+
 run pre-commit hooks
 ```bash
 pre-commit run --all-files

@@ -64,3 +64,24 @@ repos:
       hooks:
         - id: flake8
           args: [--max-line-length=180]
+
+
+
+    # Dockerfile linting
+    - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
+      rev: v0.1.0
+      hooks:
+        - id: dockerfilelint
+
+    # Shell scripting linter
+    - repo: https://github.com/shellcheck-py/shellcheck-py
+      rev: v0.8.0.3
+      hooks:
+        - id: shellcheck
+
+      # github actions linter
+#    - repo: https://github.com/sirosen/check-jsonschema
+#      rev: 0.10.0
+#      hooks:
+#        - id: check-github-actions
+#        - id: check-github-workflows

@@ -10,10 +10,15 @@ unit_tests:
     - when: on_success
 
   script:
-    - pytest --collect-only -q tests/unit || exit 0
-    - export COVERAGE_FILE=.coverage.unit
-    - python3 -m pytest -svv --color=yes --junitxml=junit_unit_report.xml --cov-config=.coveragerc --cov-report term-missing --cov-report xml --cov=src tests/unit
-    - coverage xml --omit=tests
+    |
+    # pytest --collect-only -q tests/unit || exit 0
+    if ! ls tests/unit/test_* >/dev/null 2>&1; then
+      echo "No unit tests found"
+      exit 0
+    fi
+    export COVERAGE_FILE=.coverage.unit
+    python3 -m pytest -svv --color=yes --junitxml=junit_unit_report.xml --cov-config=.coveragerc --cov-report term-missing --cov-report xml --cov=src tests/unit
+    coverage xml --omit=tests
   artifacts:
     expire_in: 2 days
     paths:
@@ -37,10 +42,15 @@ integration_tests:
       when: never
     - when: on_success
   script:
-    - pytest --collect-only -q tests/integration || exit 0
-    - export COVERAGE_FILE=.coverage.integration
-    - python3 -m pytest -s --color=yes --junitxml=junit_integration_tests_report_linux.xml --cov-config=.coveragerc --cov-report term-missing --cov-report xml --cov-append --cov=src tests/integration
-    - coverage xml --omit=tests
+    # pytest --collect-only -q tests/integration || exit 0
+    |
+      if ! ls tests/integration/test_* >/dev/null 2>&1; then
+        echo "No integration tests found"
+        exit 0
+      fi
+      export COVERAGE_FILE=.coverage.integration
+      python3 -m pytest -s --color=yes --junitxml=junit_integration_tests_report_linux.xml --cov-config=.coveragerc --cov-report term-missing --cov-report xml --cov-append --cov=src tests/integration
+      coverage xml --omit=tests
   artifacts:
     expire_in: 2 days
     paths:
@@ -60,16 +70,21 @@ system_tests:
    - linux
   rules:
     # git push -o ci.variable="system_tests=ON"
-    - if: $integration_tests=="ON"
+    - if: $system_tests=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     - when: on_success
   script:
-    - pytest --collect-only -q tests/system || exit 0
-    - export COVERAGE_FILE=.coverage.system
-    - python3 -m pytest -s --color=yes --junitxml=junit_system_tests_report_linux.xml --cov-config=.coveragerc --cov-report term-missing --cov-append --cov-report xml --cov=src tests/system
-    - coverage xml --omit=tests
-    - ls -la
+    |
+    if ! ls tests/system/test_* >/dev/null 2>&1; then
+        echo "No integration tests found"
+        exit 0
+    fi
+    # - pytest --collect-only -q tests/system || exit 0
+    export COVERAGE_FILE=.coverage.system
+    python3 -m pytest -s --color=yes --junitxml=junit_system_tests_report_linux.xml --cov-config=.coveragerc --cov-report term-missing --cov-append --cov-report xml --cov=src tests/system
+    coverage xml --omit=tests
+
   artifacts:
     expire_in: 2 days
     paths:

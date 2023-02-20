@@ -1,4 +1,4 @@
-image: python:3.8-alpine
+image: python:3.8
 
 variables:
   GIT_STRATEGY: clone
@@ -28,7 +28,12 @@ cache:
     - .cache/pip
     - venv/
 
-.pre:
+setup_ci_env:
+  stage: .pre
+  before_script:
+    - echo "Initialize CICD env..."
+  script:
+  - env
   - python -V               # Print out python version for debugging
   - pip3 install --upgrade pip
   - pip3 install virtualenv

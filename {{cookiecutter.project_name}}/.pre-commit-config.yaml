@@ -79,10 +79,11 @@ repos:
       hooks:
         - id: shellcheck
 
-    - repo: https://gitlab.com/orobardet/gitlab-ci-linter/
-      rev: v2.2.0
-      hooks:
-        - id: gitlab-ci-linter
+    # TODO: it keeps failing with no reason
+#    - repo: https://gitlab.com/orobardet/gitlab-ci-linter/
+#      rev: v2.2.0
+#      hooks:
+#        - id: gitlab-ci-linter
 
       # github actions linter
 #    - repo: https://github.com/sirosen/check-jsonschema

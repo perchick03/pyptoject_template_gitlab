@@ -13,10 +13,11 @@ deploy_package:
   needs: ["build_package"]
   before_script:
     # Overriding global before_script
+    - pip3 install virtualenv
     - virtualenv venv_python
-    - source venv/bin/activate
+    - source venv_python/bin/activate
     # Install the latest wheel build during build_pkg job
-    - pip3 install $(ls ./*.whl | xargs -n1)
+    - pip3 install $(ls dist/*.whl | xargs -n1)
     # prep for testing
     - mkdir -p /tmp/$CI_COMMIT_SHORT_SHA
     - cp -r tests /tmp/$CI_COMMIT_SHORT_SHA
@@ -36,7 +37,7 @@ pages:
     - linux
   rules:
     # git push -o ci.variable="deploy_docs=ON"
-    - if: $deploy_docs=="ON"
+    - if: $pages=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     # git tag v1.2.3 && git push origin v1.2.3

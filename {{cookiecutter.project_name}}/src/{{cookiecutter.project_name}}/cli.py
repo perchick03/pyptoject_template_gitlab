@@ -1,4 +1,5 @@
 import sys
+
 import click
 
 try:
@@ -9,7 +10,7 @@ except ModuleNotFoundError:
 
 
 class CliCtx:
-    def __init__(self):
+    def __init__(self) -> None:
         self.verbose = False
 
 
@@ -20,7 +21,7 @@ pass_ctx = click.make_pass_decorator(CliCtx, ensure=True)
 @click.option('--verbose', is_flag=True, help='Enables verbose mode.')
 @click.version_option(version=__version__)
 @pass_ctx
-def cli(ctx: CliCtx, verbose: bool):
+def cli(ctx: CliCtx, verbose: bool) -> None:
     ctx.verbose = verbose
     click.echo(click.style('Hello {{cookiecutter.project_name}}!', fg='bright_blue', bold=True))
     click.echo('{{cookiecutter.project_name}} == ' + __version__)

@@ -1,3 +1,6 @@
+# TODO: enable/disable reports
+
+
 # Combine all test reports to a single report
 # This job runs on every push or if job flag are set
 coverage_reports:

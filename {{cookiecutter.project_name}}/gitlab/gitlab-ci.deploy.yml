@@ -1,3 +1,7 @@
+# TODO: add stage for tagged commit. in this case, we pull latest package from registry and test it
+# TODO: Add image build for tagged commit with the package installed on it
+
+
 # Deploy build package into staging environment
 # TODO: Use tox and tox-wheel to test the package, currently just installing and running tests on it
 # This job is triggered on every push or if deploy_package && build_package are set to ON
@@ -36,7 +40,7 @@ pages:
   tags:
     - linux
   rules:
-    # git push -o ci.variable="deploy_docs=ON"
+    # git push -o ci.variable="pages=ON"
     - if: $pages=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never

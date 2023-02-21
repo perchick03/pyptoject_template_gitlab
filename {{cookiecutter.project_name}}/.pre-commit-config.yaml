@@ -63,7 +63,8 @@ repos:
       rev: 6.0.0
       hooks:
         - id: flake8
-          args: [--max-line-length=180]
+          # W191 indentation contains tabs
+          args: [ --max-line-length=180, --ignore=W191 ]
 
 
 

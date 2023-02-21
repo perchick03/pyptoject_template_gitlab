@@ -3,15 +3,15 @@ import sys
 import click
 
 try:
-    from {{cookiecutter.project_name}} import __version__
+	from {{cookiecutter.project_name}} import __version__
 except ModuleNotFoundError:
-    print('ModuleNotFoundError: {{cookiecutter.project_name}} not found, make sure {{cookiecutter.project_name}} is install using pip install -e .', file=sys.stderr)
-    exit(1)
+	print('ModuleNotFoundError: {{cookiecutter.project_name}} not found, make sure {{cookiecutter.project_name}} is install using pip install -e .', file=sys.stderr)
+	sys.exit(1)
 
 
 class CliCtx:
-    def __init__(self) -> None:
-        self.verbose = False
+	def __init__(self) -> None:
+		self.verbose = False
 
 
 pass_ctx = click.make_pass_decorator(CliCtx, ensure=True)
@@ -22,10 +22,10 @@ pass_ctx = click.make_pass_decorator(CliCtx, ensure=True)
 @click.version_option(version=__version__)
 @pass_ctx
 def cli(ctx: CliCtx, verbose: bool) -> None:
-    ctx.verbose = verbose
-    click.echo(click.style('Hello {{cookiecutter.project_name}}!', fg='bright_blue', bold=True))
-    click.echo('{{cookiecutter.project_name}} == ' + __version__)
+	ctx.verbose = verbose
+	click.echo(click.style('Hello {{cookiecutter.project_name}}!', fg='bright_blue', bold=True))
+	click.echo('{{cookiecutter.project_name}} == ' + __version__)
 
 
 if __name__ == '__main__':
-    cli()
+	cli()  # pylint: disable=no-value-for-parameter

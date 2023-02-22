@@ -1,4 +1,6 @@
+-e .
 -r requirements.txt
+
 build==0.10.0
 check-wheel-contents==0.4.0
 coverage==7.1.0

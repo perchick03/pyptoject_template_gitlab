@@ -168,5 +168,7 @@ code_quality:
       when: never
     # - when: on_success
     - when: never
+  # Start right away
+  needs: []
   artifacts:
     paths: [gl-code-quality-report.json]

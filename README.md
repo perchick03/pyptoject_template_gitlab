@@ -35,6 +35,7 @@ cookiecutter gl:perchick03/pyproject_template
 
 
 # GitLab project setup
+
 ```bash
 # To gitlab.com with SSH
 git push --set-upstream git@gitlab.example.com:username/new-repo.git master
@@ -42,8 +43,44 @@ git push --set-upstream git@gitlab.example.com:username/new-repo.git master
 # To gitlab.com with HTTP
 git push --set-upstream https://gitlab.example.com/username/new-repo.git master
 ```
+## Set badges
+In GitLab project, go to Settings -> General and expend Badges
 
-![img.png](img.png)
+Click Add badge
+
+![img_1.png](docs/images/img_1.png)
+
+
+Name: Pipeline Status
+Link: `https://gitlab.com/%{project_path}/-/commits/%{default_branch}`
+Badge Image URL: `https://gitlab.com/%{project_path}/badges/%{default_branch}/pipeline.svg`
+
+![img_2.png](docs/images/img_2.png)
+
+Name: Coverage
+Link: `https://gitlab.com/%{project_path}/-/commits/%{default_branch}`
+Badge Image URL: `https://gitlab.com/%{project_path}/badges/%{default_branch}/coverage.svg`
+
+## Pipeline
+![img.png](docs/images/img.png)
+
+TODO: add more details
+
+
+# Features
+
+
+# Requirements
+* Python 3.7+
+* [cookiecutter](https://github.com/cookiecutter/cookiecutter)
+* setuptools
+
+`pip install --user cookiecutter`
+
+# Usage
+
+`cookiecutter gh:perchick03/pln-proj-template-py`
+
 
 for example, lets create dummy_project:
 ```bash
@@ -65,21 +102,6 @@ cd dummy_project
 git remote add origin git@gitlab.com:developer/dummy_project.git
 git push -u origin master
 ```
-
-
-# Features
-
-
-# Requirements
-* Python 3.7+
-* [cookiecutter](https://github.com/cookiecutter/cookiecutter)
-* setuptools
-
-`pip install --user cookiecutter`
-
-# Usage
-
-`cookiecutter gh:perchick03/pln-proj-template-py`
 
 # Details
 

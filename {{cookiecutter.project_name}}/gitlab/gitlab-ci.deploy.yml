@@ -44,7 +44,7 @@ deploy_package_tagged:
   before_script:
     - echo "installing package from gitlab registry with cmd 'pip install ${CI_PROJECT_NAME}==${CI_COMMIT_TAG} --extra-index-url https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple --no-deps'"
   script:
-    - pip3 install ${CI_PROJECT_NAME}==${CI_COMMIT_TAG} --extra-index-url https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple --no-deps
+    - pip3 install --force ${CI_PROJECT_NAME}==${CI_COMMIT_TAG} --extra-index-url https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple --no-deps
     # Sanity check
     - {{cookiecutter.project_name}} --version
 

@@ -13,7 +13,8 @@ deploy_package_dev:
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     # git tag v1.2.3 && git push origin v1.2.3
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    #- if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?(-\S*)?$/
       when: never
     - when: on_success
   needs: ["build_package"]
@@ -37,7 +38,8 @@ deploy_package_tagged:
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     # git tag v1.2.3 && git push origin v1.2.3
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    # - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?(-\S*)?$/
   needs: [ "publish_package" ]
   before_script:
     - echo "installing package from gitlab registry with cmd 'pip install ${CI_PROJECT_NAME}==${CI_COMMIT_TAG} --extra-index-url https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple --no-deps'"
@@ -59,7 +61,8 @@ pages:
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     # git tag v1.2.3 && git push origin v1.2.3
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    # - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?(-\S*)?$/
   script:
     # generate docs from docstrings
     - sphinx-apidoc -o docs/source src

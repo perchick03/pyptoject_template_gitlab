@@ -96,8 +96,8 @@ package_info:
     - if: $package_info=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
-    # - when: on_success
-    - when: never
+    - when: on_success
+    #- when: never
   needs: ["build_package"]
   script:
     - echo "Show some package stats and diff from last tag"
@@ -110,23 +110,6 @@ package_info:
       - package_info.json
 
 
-# This job gives some stats about the pipeline that just ran
-# TODO: moved to python gitlab API
-pipeline_stats_report:
-  stage: reports
-  allow_failure: true
-  rules:
-    # git push -o ci.variable="pipeline_stats_report=ON"
-    - if: $pipeline_stats_report=="ON"
-    - if: $CUSTOM_PIPELINE=="ON"
-      when: never
-    # - when: on_success
-    - when: never
-  # https://docs.gitlab.com/ee/api/pipelines.html#list-project-pipelines
-  script:
-    |
-    curl --header "JOB_TOKEN: $CI_JOB_TOKEN" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines/${CI_PIPELINE_ID}"
-
 # Group all artifacts in a single place for easy download
 artifacts_report:
   stage: reports
@@ -136,8 +119,8 @@ artifacts_report:
     - if: $artifacts_report=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
-    # - when: on_success
-    - when: never
+    - when: on_success
+    #- when: never
   script:
     |
     echo "========================================================"
@@ -165,13 +148,12 @@ include:
 
 code_quality:
   stage: reports
-  image: $CI_DEV_DOCKER_IMAGE:latest
   rules:
     # git push -o ci.variable="code_quality=ON" -o ci.variable="CUSTOM_PIPELINE=ON"
     - if: $code_quality=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
-    # - when: on_success
-    - when: never
+    - when: on_success
+#    - when: never
   artifacts:
     paths: [gl-code-quality-report.json]

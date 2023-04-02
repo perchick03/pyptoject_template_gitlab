@@ -112,3 +112,16 @@ run pre-commit hooks
 ```bash
 pre-commit run --all-files
 ```
+
+## Gitlab CI
+
+### Features
+* Custom pipeline support, can trigger jobs with json
+* Using CI image for faster deployments
+* Pipeline include
+  * build wheel, sdist and validate
+  * if tag is present, upload to gitlab private pypi
+  * 
+
+
+![img.png](docs/img.png)

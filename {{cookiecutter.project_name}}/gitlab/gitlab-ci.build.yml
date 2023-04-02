@@ -37,11 +37,11 @@ build_package:
       when: never
     - when: on_success
   script:
-    - python3 -m build --wheel --sdist --outdir dist
+    - python3 -m build --wheel --outdir dist
     - check-wheel-contents dist/*.whl
   artifacts:
     paths:
-      - dist/*.whl
+      - dist
     expire_in: 1 day
   needs:
     - job: build_ci_image
@@ -59,10 +59,14 @@ publish_package:
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     # git tag v1.2.3 && git push origin v1.2.3
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    # - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?(-\S*)?$/
   needs:
     - build_package
   script:
     - echo "Publishing package to GitLab package registry..."
-    - twine upload --repository-url ${TWINE_REPO_URL} $(ls dist/*.whl | xargs -n1) --verbose
-    - twine upload --repository-url ${TWINE_REPO_URL} $(ls dist/*.tar.gz | xargs -n1) --verbose
+    - WHEEL_FILE=$(ls dist/*.whl | xargs -n1)
+    - echo "WHEEL_FILE- $WHEEL_FILE"
+    - twine upload --repository-url ${TWINE_REPO_URL} ${WHEEL_FILE} --verbose
+    # TODO: im getting error from gitlab regarding package name has been taken
+    # - twine upload --repository-url ${TWINE_REPO_URL} $(ls dist/*.tar.gz | xargs -n1) --verbose

@@ -1,6 +1,10 @@
 {
     "project_name": "",
+    "description": "{{ cookiecutter.project_name }} description",
     "full_name": "Peretz Levinov",
     "email": "perchick03@gmail.com",
-    "initialize_project": ["yes", "no"]
+    "init_project": ["yes", "no"],
+    "init_gitlab": ["yes", "no"],
+    "gitlab_url": "gitlab.com",
+    "gitlab_namespace": "perchick03"
 }

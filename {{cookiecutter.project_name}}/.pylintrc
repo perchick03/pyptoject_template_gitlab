@@ -9,7 +9,7 @@
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=templates,
+ignore=_version.py
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -61,7 +61,8 @@ load-plugins=pylint.extensions.docparams
 
 # C0111: missing docstring
 # R0903: too-few-public-methods
-disable=C0111,R0903
+# W1203: logging-fstring-interpolation Use lazy % formatting in logging functions
+disable=C0111,R0903,W1203
 
 
 [REPORTS]
@@ -184,7 +185,7 @@ max-module-lines=1000
 
 # String used as indentation unit. This is usually " " (4 spaces) or "\t" (1
 # tab).
-indent-string='\t'
+indent-string='    '
 
 [SPELLING]
 

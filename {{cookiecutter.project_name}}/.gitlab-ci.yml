@@ -19,6 +19,12 @@ variables:
   # for pipeline debug
   CI_DEBUG_TRACE: "false"
 
+  # TODO
+  # Custom pipeline - Custom pipeline offers the ability to specific jobs regardless of the trigger type.
+  # To use it, set CUSTOM_PIPELINE to "ON" and set CUSTOM_PIPELINE_CONF_FILE to the path of the json file with the jobs to run.
+  CUSTOM_PIPELINE: "OFF"
+  CUSTOM_PIPELINE_CONF_FILE: ""
+
 # https://pip.pypa.io/en/stable/reference/pip_install/#caching
 #
 # If you want to also cache the installed packages, you have to install
@@ -28,22 +34,28 @@ cache:
     - .cache/pip
     - venv/
 
-setup_ci_env:
-  stage: .pre
-  before_script:
-    - echo "Initialize CICD env..."
-  script:
-  - env
-  - python -V               # Print out python version for debugging
-  - pip3 install --upgrade pip
-  - pip3 install virtualenv
-  - virtualenv venv
-  - source venv/bin/activate
-  - pip3 install -r requirements_dev.txt
-  - pip3 install -e .
+#setup_ci_env:
+#  stage: .pre
+#  before_script:
+#    - echo "Initialize CICD env..."
+#  script:
+#  - env
+#  - python -V               # Print out python version for debugging
+#  - pip3 install --upgrade pip
+#  - pip3 install virtualenv
+#  - virtualenv venv
+#  - source venv/bin/activate
+#  - pip3 install -r requirements_dev.txt
+#  - pip3 install -e .
+
+#before_script:
+#  - source venv/bin/activate
 
 before_script:
-  - source venv/bin/activate
+  - echo "Initialize CICD env..."
+  - pip3 install -e .
+  - env
+
 
 stages:
   - build
@@ -60,7 +72,6 @@ workflow:
     - when: always
 
 include:
-  - local: "gitlab/gitlab-ci.build_ci_image.yml"
   - local: "gitlab/gitlab-ci.build.yml"
   - local: "gitlab/gitlab-ci.tests.yml"
   - local: "gitlab/gitlab-ci.deploy.yml"

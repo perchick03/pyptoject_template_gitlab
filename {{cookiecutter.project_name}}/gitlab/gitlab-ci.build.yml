@@ -1,8 +1,37 @@
+# Job to build CI image and push to GitLab registry
+# Will only run when triggered directly "build_ci_image=ON"
+build_ci_image:
+  stage: build
+  image: docker:latest
+  tags:
+    - linux
+  services:
+    - docker:dind
+  before_script:
+    # override default global before_script
+    - echo "Build CI image..."
+  rules:
+    # git push -o ci.variable="CUSTOM_PIPELINE=ON" -o ci.variable="build_ci_image=ON"
+    - if: $build_ci_image=="ON"
+    - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    # Run if any of the following files changed last commit
+#    - changes:
+#      - gitlab/Dockerfile
+#      - requirements.txt
+#      - requirements_dev.txt
+
+  script: |
+    docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    docker build --pull --cache-from $CI_DEV_DOCKER_IMAGE:latest -f gitlab/Dockerfile --tag "$CI_DEV_DOCKER_IMAGE:latest" --tag "$CI_DEV_DOCKER_IMAGE:${CI_DEV_DOCKER_VERSION}" .
+    docker push "$CI_DEV_DOCKER_IMAGE" --all-tags
+
 # Build python package
 build_package:
   stage: build
+  image: $CI_DEV_DOCKER_IMAGE:latest
   rules:
-    # git push -o ci.variable="build_package=ON"
+    # git push -o ci.variable="build_package=ON" -o ci.variable="CUSTOM_PIPELINE=ON"
     - if: $build_package=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
@@ -12,22 +41,32 @@ build_package:
     - check-wheel-contents dist/*.whl
   artifacts:
     paths:
-      - dist/*.whl
+      - dist
     expire_in: 1 day
+  needs:
+    - job: build_ci_image
+      optional: true
 
 
 # Publish python package to gitlab package registry
 # This job will run on a tag push of semantic version format (e.g., v1.2.3)
 publish_package:
   stage: build
+  image: $CI_DEV_DOCKER_IMAGE:latest
   rules:
-    # git push -o ci.variable="publish_package=ON" -o ci.variable="build_package=ON"
+    # git push -o ci.variable="publish_package=ON" -o ci.variable="build_package=ON" -o ci.variable="CUSTOM_PIPELINE=ON"
     - if: $publish_package=="ON" && $build_package=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     # git tag v1.2.3 && git push origin v1.2.3
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    # - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?(-\S*)?$/
   needs:
     - build_package
   script:
-    - twine upload --repository-url ${TWINE_REPO_URL} dist/*.whl --verbose
+    - echo "Publishing package to GitLab package registry..."
+    - WHEEL_FILE=$(ls dist/*.whl | xargs -n1)
+    - echo "WHEEL_FILE- $WHEEL_FILE"
+    - twine upload --repository-url ${TWINE_REPO_URL} ${WHEEL_FILE} --verbose
+    # TODO: im getting error from gitlab regarding package name has been taken
+    # - twine upload --repository-url ${TWINE_REPO_URL} $(ls dist/*.tar.gz | xargs -n1) --verbose

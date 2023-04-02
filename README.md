@@ -62,6 +62,14 @@ Link: `https://gitlab.com/%{project_path}/-/commits/%{default_branch}`
 Badge Image URL: `https://gitlab.com/%{project_path}/badges/%{default_branch}/coverage.svg`
 
 ## Pipeline
+
+### Features
+* Custom pipeline support, can trigger jobs with json
+* Using CI image for faster deployments
+* Pipeline include
+  * build wheel, sdist and validate
+  * if tag is present, upload to gitlab private pypi
+  * 
 ![img.png](docs/images/img.png)
 
 TODO: add more details

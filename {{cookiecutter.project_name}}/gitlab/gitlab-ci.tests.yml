@@ -1,98 +1,60 @@
-unit_tests:
+.test_base:
   stage: tests
+  image: $CI_DEV_DOCKER_IMAGE:latest
   tags:
    - linux
+  variables:
+    TEST_TYPE: "unit" # Can be unit, integration, or system
+  script:
+    |
+    if ! ls tests/$TEST_TYPE/test_* >/dev/null 2>&1; then
+      echo "No $TEST_TYPE tests found"
+      exit 0
+    fi
+    export COVERAGE_FILE=.coverage.$TEST_TYPE
+    python3 -m pytest -svv --color=yes --junitxml=junit_$TEST_TYPE_tests_report_linux.xml --cov-config=.coveragerc --cov-report term-missing --cov-report xml --cov-append --cov=src tests/$TEST_TYPE
+    coverage xml --omit=tests
+  artifacts:
+    expire_in: 2 days
+    paths:
+      - .coverage.$TEST_TYPE
+      - coverage.xml
+      - junit_$TEST_TYPE_tests_report_linux.xml
+    reports:
+      junit: junit_$TEST_TYPE_tests_report_linux.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+unit_tests:
+  variables:
+    TEST_TYPE: "unit"
+  extends: .test_base
   rules:
-    # git push -o ci.variable="unit_tests=ON"
+    # git push -o ci.variable="unit_tests=ON" -o ci.variable="CUSTOM_PIPELINE=ON"
     - if: $unit_tests=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     - when: on_success
 
-  script:
-    |
-    # pytest --collect-only -q tests/unit || exit 0
-    if ! ls tests/unit/test_* >/dev/null 2>&1; then
-      echo "No unit tests found"
-      exit 0
-    fi
-    export COVERAGE_FILE=.coverage.unit
-    python3 -m pytest -svv --color=yes --junitxml=junit_unit_report.xml --cov-config=.coveragerc --cov-report term-missing --cov-report xml --cov=src tests/unit
-    coverage xml --omit=tests
-  artifacts:
-    expire_in: 2 days
-    paths:
-      - .coverage.unit
-      - coverage.xml
-      - junit_unit_report.xml
-    reports:
-      junit: junit_unit_report.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage.xml
-
 integration_tests:
-  stage: tests
-  tags:
-   - linux
+  variables:
+    TEST_TYPE: "integration"
+  extends: .test_base
   rules:
-    # git push -o ci.variable="integration_tests=ON"
+    # git push -o ci.variable="integration_tests=ON" -o ci.variable="CUSTOM_PIPELINE=ON"
     - if: $integration_tests=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     - when: on_success
-  script:
-    # pytest --collect-only -q tests/integration || exit 0
-    |
-      if ! ls tests/integration/test_* >/dev/null 2>&1; then
-        echo "No integration tests found"
-        exit 0
-      fi
-      export COVERAGE_FILE=.coverage.integration
-      python3 -m pytest -s --color=yes --junitxml=junit_integration_tests_report_linux.xml --cov-config=.coveragerc --cov-report term-missing --cov-report xml --cov-append --cov=src tests/integration
-      coverage xml --omit=tests
-  artifacts:
-    expire_in: 2 days
-    paths:
-      - .coverage.integration
-      - coverage.xml
-      - junit_integration_tests_report_linux.xml
-    reports:
-      junit: junit_integration_tests_report_linux.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage.xml
-
 
 system_tests:
-  stage: tests
-  tags:
-   - linux
+  variables:
+    TEST_TYPE: "system"
+  extends: .test_base
   rules:
-    # git push -o ci.variable="system_tests=ON"
+    # git push -o ci.variable="system_tests=ON" -o ci.variable="CUSTOM_PIPELINE=ON"
     - if: $system_tests=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     - when: on_success
-  script:
-    |
-    if ! ls tests/system/test_* >/dev/null 2>&1; then
-        echo "No integration tests found"
-        exit 0
-    fi
-    # - pytest --collect-only -q tests/system || exit 0
-    export COVERAGE_FILE=.coverage.system
-    python3 -m pytest -s --color=yes --junitxml=junit_system_tests_report_linux.xml --cov-config=.coveragerc --cov-report term-missing --cov-append --cov-report xml --cov=src tests/system
-    coverage xml --omit=tests
-
-  artifacts:
-    expire_in: 2 days
-    paths:
-      - coverage.xml
-      - .coverage.system
-      - junit_system_tests_report_linux.xml
-    reports:
-      junit: junit_system_tests_report_linux.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage.xml

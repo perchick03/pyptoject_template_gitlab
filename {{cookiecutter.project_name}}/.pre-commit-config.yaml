@@ -29,7 +29,7 @@ repos:
 
     # pep-8 style https://ayush-raj-blogs.hashnode.dev/making-clean-pr-for-open-source-contributors-pep-8-style
     - repo: https://github.com/myint/autoflake
-      rev: v2.0.1
+      rev: v2.0.2
       hooks:
         - id: autoflake
           args:
@@ -39,20 +39,30 @@ repos:
             - --remove-duplicate-keys
             - --remove-unused-variables
 
+    # Automatically upgrade python syntax
+    - repo: https://github.com/asottile/pyupgrade
+      rev: v3.3.1
+      hooks:
+        - id: pyupgrade
 
-    # Lines containing and after lines which contain a # noreorder comment will be ignored (import matplotlib  # noreorder)
-    # The style chosen by reorder-python-imports has a single aim: reduce merge conflicts.
-    -   repo: https://github.com/asottile/reorder_python_imports
-        rev: v3.9.0
-        hooks:
-        - id: reorder-python-imports
-          name: Reorder Python imports (src, tests)
-          files: "^(?!docs/)"
-          args: ["--application-directories", "src"]
+
+    - repo: https://github.com/pycqa/isort
+      rev: 5.12.0
+      hooks:
+        - id: isort
+          name: isort (python)
+          args: ['--multi-line', '3',
+                 '--trailing-comma',
+                 '--force-grid-wrap=0',
+                 '--combine-as',
+                 '--line-width', '120',
+                 '--skip', 'docs',
+                 '--skip', 'tests']
+
 
     # mypy - lint-like type checking
     - repo: https://github.com/pre-commit/mirrors-mypy
-      rev: v1.0.1
+      rev: v1.1.1
       hooks:
         - id: mypy
           additional_dependencies: [types-all]
@@ -76,7 +86,7 @@ repos:
 
     # Shell scripting linter
     - repo: https://github.com/shellcheck-py/shellcheck-py
-      rev: v0.8.0.3
+      rev: v0.9.0.2
       hooks:
         - id: shellcheck
 

@@ -5,13 +5,16 @@
 # Deploy build package into staging environment
 # TODO: Use tox and tox-wheel to test the package, currently just installing and running tests on it
 # This job is triggered on every push or if deploy_package && build_package are set to ON
-deploy_package:
+deploy_package_dev:
   stage: deploy
-  environment: staging
   rules:
-    # git push -o ci.variable="deploy_package=ON" -o ci.variable="build_package=ON"
-    - if: $deploy_package=="ON" && $build_package=="ON"
+    # git push -o ci.variable="deploy_package_dev=ON" -o ci.variable="build_package=ON"
+    - if: $deploy_package_dev=="ON" && $build_package=="ON"
     - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    # git tag v1.2.3 && git push origin v1.2.3
+    #- if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?(-\S*)?$/
       when: never
     - when: on_success
   needs: ["build_package"]
@@ -22,16 +25,29 @@ deploy_package:
     - source venv_python/bin/activate
     # Install the latest wheel build during build_pkg job
     - pip3 install $(ls dist/*.whl | xargs -n1)
-    # prep for testing
-    - mkdir -p /tmp/$CI_COMMIT_SHORT_SHA
-    - cp -r tests /tmp/$CI_COMMIT_SHORT_SHA
-    - pip3 install pytest
   script:
     # Sanity check
-    - {{cookiecutter.project_name}}_cli --version
-    - cd /tmp/$CI_COMMIT_SHORT_SHA
-    # TODO: split to deploy test using @pytest.mark.deploy|e2e to run deploy tests, currently will run all tests again
-    - pytest -svv ./tests
+    - {{cookiecutter.project_name}} --version
+
+
+deploy_package_tagged:
+  stage: deploy
+  rules:
+    # git push -o ci.variable="deploy_package=ON" -o ci.variable="build_package=ON"
+    - if: $deploy_package_tagged=="ON" && $build_package=="ON"
+    - if: $CUSTOM_PIPELINE=="ON"
+      when: never
+    # git tag v1.2.3 && git push origin v1.2.3
+    # - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?(-\S*)?$/
+  needs: [ "publish_package" ]
+  before_script:
+    - echo "installing package from gitlab registry with cmd 'pip install ${CI_PROJECT_NAME}==${CI_COMMIT_TAG} --extra-index-url https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple --no-deps'"
+  script:
+    - pip3 install --force ${CI_PROJECT_NAME}==${CI_COMMIT_TAG} --extra-index-url https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi/simple --no-deps
+    # Sanity check
+    - {{cookiecutter.project_name}} --version
+
 
 # Deploy documentation to gitlab pages
 # This job runs when a new version tag is pushed (e.g., v1.2.3) or when deploy_docs is set to ON
@@ -45,7 +61,8 @@ pages:
     - if: $CUSTOM_PIPELINE=="ON"
       when: never
     # git tag v1.2.3 && git push origin v1.2.3
-    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    # - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - if: $CI_COMMIT_TAG =~ /^\d+\.\d+(\.\d+)?(-\S*)?$/
   script:
     # generate docs from docstrings
     - sphinx-apidoc -o docs/source src

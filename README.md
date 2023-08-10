@@ -1,52 +1,61 @@
 # pyproject_template
 
 
-This is a template for a Python project I use in as base for my personal projects.
-It is based on best practices I use in most of my projects.
-
-I based on [cookiecutter](https://github.com/cookiecutter/cookiecutter) tool to create this template.
+This is a Python project template I use as a base for my personal projects. It encapsulates the best practices I employ in most of my projects 
+and leverages the [cookiecutter](https://github.com/cookiecutter/cookiecutter) tool to create the template.
 
 # Features
-* filesystem src layout
-* versioning with setuptools_scm
-* git pre-commit hooks
-* gitlab-ci pipeline setup
-* tests
-  * unit, integration and system split
-  * using pytest
-* basic cli with click
-* project post-gen initialization - will initialize git and setup pre-commit hooks
-* code quality tools such as pylint, mypy, flake8
-* tox setup
+* **Filesystem src layout**: Organized for efficient management.
+* **Package Versioning**: Utilizes setuptools_scm for version control and uses git tags and CI/CD to manage versions.
+* **Code Quality:** using git pre-commit hooks for code quality and static analysis tools such as pylint, mypy, flake8
+* **Documentation:** using sphinx
+* **Advanced GitLab-CI Pipeline Setup:** includes build, test, deploy, and report stages with features like:
+  * **Private GitLab artifactory** for storing wheels and Docker images.
+  * **Custom pipeline** support. You can choose what jobs to run and build your own pipeline from CLI or using json.
+  * **CI Dev Image** Faster deployment using dev image which automatically identify changes in requirements or Dockerfile and rebuild itself next merge request
+  * **Efficient DAG** dependencies for faster pipeline execution
+  * **Tag Pipeline** - Identify when a tag is pushed and build a release with artifacts and documentation 
+  * **Report Stage** - Collects all the information a manager might want to see in one place such as code quality reports, code coverage reports, package information, pipeline stats and more
+![img.png](docs%2Fimg.png)
+  * **Cross Project Trigger** - Support sending artifact to another project and run a custom pipeline there.
+  * **Encourage good development practices** - Tests are split into unit, integration and system tests. Unit tests are run on every commit, integration and system tests are run on merge request. 
+  * **Split Merge Request from general push** - When the user opens a merge request, the pipeline will shift to more comprehensive tests and checks. This split allows for much quicker development process.
+* **Testing Framework:** Split into unit, integration, and system levels using pytest and tox.
+* **CLI Support:** Basic command-line interface using click. 
+* **Project Post-Gen Initialization:** Automates git setup, pre-commit hooks, GitLab configuration, virtual environment, and project installation.
+* **Quality Assurance:** Integrates tools like pylint, mypy, and flake8.
 * documentation with sphinx
 
 
 # Quick Start
-Install the latest Cookiecutter if you haven't installed it yet:
+**Install Cookiecutter** 
 ```bash
 pip install -U cookiecutter
 ```
 
-Generate a Python package project:
+**Generate a Python package project:**
 ```bash
 cookiecutter gl:perchick03/pyproject_template
 ```
 
+**Initialization** (Optional)
+
+```bash
+cd <project_name>
+source .venv/bin/activate 
+<project_name> --version
+```
 
 
 # GitLab project setup
 
+**Push to gitlab**
 ```bash
-# To gitlab.com with SSH
 git push --set-upstream git@gitlab.example.com:username/new-repo.git master
-
-# To gitlab.com with HTTP
-git push --set-upstream https://gitlab.example.com/username/new-repo.git master
 ```
 ## Set badges
-In GitLab project, go to Settings -> General and expend Badges
+In GitLab project, go to Settings -> General and expand Badges. Add Pipeline Status and Coverage badges as shown:
 
-Click Add badge
 
 ![img_1.png](docs/images/img_1.png)
 
@@ -87,7 +96,7 @@ TODO: add more details
 
 # Usage
 
-`cookiecutter gh:perchick03/pln-proj-template-py`
+`cookiecutter gh:perchick03/pyproject_template`
 
 
 for example, lets create dummy_project:

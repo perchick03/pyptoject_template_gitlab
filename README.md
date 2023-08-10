@@ -1,4 +1,4 @@
-# pyproject_template
+# (WIP) pyproject_template
 
 
 This is a Python project template I use as a base for my personal projects. It encapsulates the best practices I employ in most of my projects 
